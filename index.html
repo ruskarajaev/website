@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои Дела и Заметки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Todo Styles */
+        .todo-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #todoInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #todoInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-add {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #5568d3;
+        }
+
+        .todo-list {
+            list-style: none;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .todo-item:hover {
+            background: #e9ecef;
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 16px;
+        }
+
+        .btn-delete {
+            padding: 8px 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        /* Notes Styles */
+        .notes-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .note-item {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .note-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .note-date {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .btn-delete-note {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Мои Дела и Заметки</h1>
+        
+        <div class="main-content">
+            <!-- Todo Section -->
+            <div class="card">
+                <h2>✅ Список дел</h2>
+                <div class="todo-input-container">
+                    <input type="text" id="todoInput" placeholder="Добавить новое дело..." />
+                    <button class="btn-add" onclick="addTodo()">Добавить</button>
+                </div>
+                <ul class="todo-list" id="todoList"></ul>
+            </div>
+
+            <!-- Notes Section -->
+            <div class="card">
+                <h2>💭 Мои мысли</h2>
+                <div class="todo-input-container">
+                    <input type="text" id="noteInput" placeholder="Записать мысль..." onkeypress="if(event.key==='Enter') addNote()" />
+                    <button class="btn-add" onclick="addNote()">Записать</button>
+                </div>
+                <div class="notes-container" id="notesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load data from localStorage
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+        let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+        // Save data to localStorage
+        function saveTodos() {
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        function saveNotes() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        // Todo Functions
+        function renderTodos() {
+            const todoList = document.getElementById('todoList');
+            
+            if (todos.length === 0) {
+                todoList.innerHTML = '<li class="empty-message">Нет активных дел</li>';
+                return;
+            }
+
+            todoList.innerHTML = todos.map((todo, index) => `
+                <li class="todo-item ${todo.completed ? 'completed' : ''}">
+                    <input type="checkbox" class="todo-checkbox" 
+                           ${todo.completed ? 'checked' : ''} 
+                           onchange="toggleTodo(${index})" />
+                    <span class="todo-text">${escapeHtml(todo.text)}</span>
+                    <button class="btn-delete" onclick="deleteTodo(${index})">Удалить</button>
+                </li>
+            `).join('');
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                todos.push({ text, completed: false });
+                saveTodos();
+                renderTodos();
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function toggleTodo(index) {
+            todos[index].completed = !todos[index].completed;
+            saveTodos();
+            renderTodos();
+        }
+
+        function deleteTodo(index) {
+            todos.splice(index, 1);
+            saveTodos();
+            renderTodos();
+        }
+
+        // Note Functions
+        function renderNotes() {
+            const notesContainer = document.getElementById('notesContainer');
+            
+            if (notes.length === 0) {
+                notesContainer.innerHTML = '<div class="empty-message">Нет записей</div>';
+                return;
+            }
+
+            notesContainer.innerHTML = notes.map((note, index) => `
+                <div class="note-item">
+                    <button class="btn-delete-note" onclick="deleteNote(${index})">×</button>
+                    <div class="note-text">${escapeHtml(note.text)}</div>
+                    <div class="note-date">${note.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function addNote() {
+            const input = document.getElementById('noteInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                const now = new Date();
+                const date = now.toLocaleDateString('ru-RU') + ' ' + 
+                            now.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+                
+                notes.unshift({ text, date });
+                saveNotes();
+                renderNotes();
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function deleteNote(index) {
+            notes.splice(index, 1);
+            saveNotes();
+            renderNotes();
+        }
+
+        // Utility function to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Add todo on Enter key
+        document.getElementById('todoInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addTodo();
+            }
+        });
+
+        // Initial render
+        renderTodos();
+        renderNotes();
+    </script>
+</body>
+</html>
